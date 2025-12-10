@@ -86,7 +86,7 @@ export default function RootLayout() {
             <nav className="hidden md:flex items-center gap-8">
                <Link to="/" className="text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-neon-green transition-colors">Inicio</Link>
                <Link to="/cursos" className="text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-neon-green transition-colors">Academia</Link>
-               <Link to="/cursos" className="text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-neon-green transition-colors">Mis Cursos</Link>
+               <Link to="/my-courses" className="text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-neon-green transition-colors">Mis Cursos</Link>
             </nav>
 
             {/* ICONS AREA (RIGHT ALIGNED) */}
