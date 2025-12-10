@@ -160,6 +160,8 @@ export default function Cursos() {
             })}
           </div>
         )}
+          </>
+        )}
       </div>
     </div>
   );
