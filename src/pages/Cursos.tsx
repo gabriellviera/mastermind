@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { ShoppingCart, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import FreeLessons from './FreeLessons';
 
 type Course = {
   id: string;
@@ -18,6 +19,7 @@ export default function Cursos() {
   const { addToCart, cart } = useCart();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'academy' | 'free'>('academy');
 
   useEffect(() => {
     fetchCourses();
@@ -50,9 +52,40 @@ export default function Cursos() {
   return (
     <div className="min-h-screen pt-32 px-4 pb-24">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-5xl font-black italic mb-12 text-center">ACADEMIA <span className="text-neon-green">PRO</span></h1>
+        <h1 className="text-5xl font-black italic mb-8 text-center">
+          ACADEMIA <span className="text-neon-green">PRO</span>
+        </h1>
         
-        {courses.length === 0 ? (
+        {/* TABS */}
+        <div className="flex justify-center gap-4 mb-12">
+          <button
+            onClick={() => setActiveTab('academy')}
+            className={`px-8 py-4 rounded-2xl font-bold uppercase tracking-wider transition-all ${
+              activeTab === 'academy'
+                ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(57,255,20,0.3)]'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            Cursos
+          </button>
+          <button
+            onClick={() => setActiveTab('free')}
+            className={`px-8 py-4 rounded-2xl font-bold uppercase tracking-wider transition-all ${
+              activeTab === 'free'
+                ? 'bg-neon-green text-black shadow-[0_0_20px_rgba(57,255,20,0.3)]'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+            }`}
+          >
+            Clases Abiertas 🎁
+          </button>
+        </div>
+
+        {/* CONTENT */}
+        {activeTab === 'free' ? (
+          <FreeLessons />
+        ) : (
+          <>
+            {courses.length === 0 ? (
           <div className="text-center text-gray-500 py-12">
             <p className="text-xl">No hay cursos disponibles aún.</p>
             <p className="text-sm mt-2">Vuelve pronto para ver nuestros cursos 🚀</p>
