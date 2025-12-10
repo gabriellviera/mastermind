@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Menu, X, LayoutDashboard, Users, MessageSquare, Settings, BookOpen, LogOut, Home as HomeIcon, MessageSquareDashed, Lock, ArrowRight, BarChart3 } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Users, MessageSquare, Settings, BookOpen, LogOut, Home as HomeIcon, MessageSquareDashed, Lock, ArrowRight, BarChart3, BarChart2, PlayCircle, ShieldCheck } from 'lucide-react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const sidebarItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
-    { icon: BarChart3, label: 'Analytics', path: '/admin/analytics' },
-    { icon: BookOpen, label: 'Cursos', path: '/admin/courses' },
+    { icon: BarChart2, label: 'Analytics', path: '/admin/analytics' },
+    { icon: PlayCircle, label: 'Cursos', path: '/admin/courses' },
     { icon: Users, label: 'Usuarios', path: '/admin/users' },
     { icon: MessageSquare, label: 'Comentarios', path: '/admin/comments' },
+    { icon: ShieldCheck, label: 'Herramientas', path: '/admin/tools' },
     { icon: HomeIcon, label: 'Home Config', path: '/admin/home-config' },
     { icon: MessageSquareDashed, label: 'Popup Banner', path: '/admin/popup-config' },
     { icon: Settings, label: 'Configuración', path: '/admin/settings' },

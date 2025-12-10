@@ -20,6 +20,7 @@ import AdminCourseLessons from './pages/Admin/AdminCourseLessons';
 import AdminSettings from './pages/Admin/AdminSettings';
 import AdminComments from './pages/Admin/AdminComments'; // Now exists
 import AdminUsers from './pages/Admin/AdminUsers'; // Now exists
+import AdminTools from './pages/Admin/AdminTools'; // New Import
 import AdminHomeConfig from './pages/Admin/AdminHomeConfig'; // Now exists
 import AdminPopupConfig from './pages/Admin/AdminPopupConfig';  // Now exists
 import PopupBanner from './components/PopupBanner';  // Now exists
@@ -51,8 +52,8 @@ export default function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="comments" element={<AdminComments />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="tools" element={<AdminTools />} />
             <Route path="home-config" element={<AdminHomeConfig />} />
-            <Route path="popup-config" element={<AdminPopupConfig />} />
             <Route path="popup-config" element={<AdminPopupConfig />} />
         </Route>
         
