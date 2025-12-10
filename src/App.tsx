@@ -4,6 +4,7 @@ import RootLayout from './layouts/RootLayout';
 import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/Home';
 import Cursos from './pages/Cursos';
+import MyCourses from './pages/MyCourses';
 import CoursePlayer from './pages/CoursePlayer';
 import CourseDetail from './pages/CourseDetail';
 import Checkout from './pages/Checkout';
@@ -32,6 +33,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cursos" element={<Cursos />} />
+          <Route path="/my-courses" element={<MyCourses />} />
           <Route path="/curso-info/:id" element={<CourseDetail />} />
           <Route path="/curso/:id" element={<CoursePlayer />} />
           <Route path="/checkout" element={<Checkout />} />
