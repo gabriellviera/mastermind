@@ -15,6 +15,9 @@ export default function RootLayout() {
   // Mock Auth State (Replace with real Supabase Auth)
   const [user, setUser] = useState<{name: string} | null>(null);
 
+  // PWA Install Prompt
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
@@ -27,6 +30,25 @@ export default function RootLayout() {
     root.classList.remove('light', 'dark');
     root.classList.add(isDark ? 'dark' : 'light');
   }, [isDark]);
+
+  // PWA Install Logic
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const handleMyCoursesClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -94,23 +116,28 @@ export default function RootLayout() {
             </nav>
 
             {/* ICONS AREA (RIGHT ALIGNED) */}
-            <div className="flex items-center gap-4 text-foreground">
-                {/* 1. THEME TOGGLE (Leftmost of the group) */}
-                <button onClick={() => setIsDark(!isDark)} className="p-2 hover:bg-secondary rounded-full transition-colors order-1 text-foreground">
-                    {isDark ? <Moon size={20} /> : <Sun size={20} />}
+            <div className="flex items-center gap-2 text-foreground">
+                {/* 1. THEME TOGGLE */}
+                <button onClick={() => setIsDark(!isDark)} className="p-2 hover:bg-secondary rounded-full transition-colors text-foreground">
+                    {isDark ? <Moon size={18} /> : <Sun size={18} />}
                 </button>
 
                 {/* 2. INSTALL APP */}
-                <button className="hidden sm:flex bg-neon-green/10 text-neon-green px-3 py-1.5 rounded-lg text-xs font-bold uppercase items-center gap-2 hover:bg-neon-green/20 transition-colors order-2">
-                   <Download size={14} /> <span className="hidden lg:inline">Instalar App</span>
-                </button>
+                {deferredPrompt && (
+                  <button 
+                    onClick={handleInstallClick}
+                    className="p-2 hover:bg-secondary rounded-full transition-colors text-neon-green"
+                  >
+                    <Download size={18} />
+                  </button>
+                )}
 
-                {/* 3. CART ICON (Rightmost) */}
+                {/* 3. CART ICON */}
                 <button 
                   onClick={toggleCart}
-                  className="relative p-2 hover:bg-secondary rounded-full transition-colors order-3 text-foreground"
+                  className="relative p-2 hover:bg-secondary rounded-full transition-colors text-foreground"
                 >
-                    <ShoppingBag size={20} />
+                    <ShoppingBag size={18} />
                     {cart.length > 0 && (
                         <span className="absolute -top-1 -right-1 bg-neon-green text-black text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-bounce">
                             {cart.length}
@@ -118,9 +145,9 @@ export default function RootLayout() {
                     )}
                 </button>
                 
-                {/* LOGIN ICON (Extra) */}
-                <Link to="/login" className="hidden md:block p-2 hover:bg-secondary rounded-full transition-colors order-4 text-muted-foreground hover:text-foreground">
-                    <User size={20} />
+                {/* 4. LOGIN ICON */}
+                <Link to="/login" className="hidden md:block p-2 hover:bg-secondary rounded-full transition-colors text-muted-foreground hover:text-foreground">
+                    <User size={18} />
                 </Link>
             </div>
         </div>
