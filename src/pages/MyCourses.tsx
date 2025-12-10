@@ -9,29 +9,13 @@ type EnrolledCourse = {
   description: string | null;
   image_url: string | null;
   created_at: string;
+  slug: string; // Added
 };
 
 export default function MyCourses() {
   const [user, setUser] = useState<any>(null);
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
-    
-    if (user) {
-      fetchMyCourses(user.id);
-    } else {
-      setLoading(false);
-    }
-  };
-
+  // ...
   const fetchMyCourses = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -42,7 +26,8 @@ export default function MyCourses() {
             id,
             title,
             description,
-            image_url
+            image_url,
+            slug
           )
         `)
         .eq('user_id', userId);
@@ -54,6 +39,7 @@ export default function MyCourses() {
         title: item.courses.title,
         description: item.courses.description,
         image_url: item.courses.image_url,
+        slug: item.courses.slug,
         created_at: item.created_at,
       })) || [];
 
@@ -152,10 +138,10 @@ export default function MyCourses() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
+            {courses.map((course) => (
             <Link
               key={course.id}
-              to={`/curso/${course.id}`}
+              to={`/curso/${course.slug || course.id}`}
               className="group glass-panel rounded-2xl overflow-hidden border border-white/10 hover:border-neon-green/50 transition-all hover:scale-[1.02] active:scale-95"
             >
               {course.image_url ? (
