@@ -50,15 +50,21 @@ export default function AdminCourses() {
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `course-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `course-images/${fileName}`;
 
       // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('course-content')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       // Get public URL
       const { data } = supabase.storage.from('course-content').getPublicUrl(filePath);
@@ -78,9 +84,9 @@ export default function AdminCourses() {
       }
 
       alert('Imagen subida exitosamente');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading:', error);
-      alert('Error al subir imagen');
+      alert(`Error al subir imagen: ${error.message || 'Error desconocido'}`);
     } finally {
       setUploading(false);
     }
