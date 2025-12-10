@@ -8,7 +8,7 @@ type EnrolledCourse = {
   title: string;
   description: string | null;
   image_url: string | null;
-  enrolled_at: string;
+  created_at: string;
 };
 
 export default function MyCourses() {
@@ -37,7 +37,7 @@ export default function MyCourses() {
       const { data, error } = await supabase
         .from('enrollments')
         .select(`
-          enrolled_at,
+          created_at,
           courses (
             id,
             title,
@@ -54,7 +54,7 @@ export default function MyCourses() {
         title: item.courses.title,
         description: item.courses.description,
         image_url: item.courses.image_url,
-        enrolled_at: item.enrolled_at,
+        created_at: item.created_at,
       })) || [];
 
       setCourses(formatted);
@@ -182,7 +182,7 @@ export default function MyCourses() {
                 
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <span className="text-xs text-gray-500 uppercase tracking-wider">
-                    Inscrito {new Date(course.enrolled_at).toLocaleDateString()}
+                    Inscrito {new Date(course.created_at).toLocaleDateString()}
                   </span>
                   <div className="flex items-center gap-2 text-neon-green font-bold text-sm">
                     Continuar
