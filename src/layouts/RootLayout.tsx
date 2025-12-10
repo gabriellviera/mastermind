@@ -168,10 +168,14 @@ export default function RootLayout() {
               {/* Mis Cursos */}
               <Link
                 to="/my-courses"
-                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+                className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all ${
+                  location.pathname === '/my-courses' ? 'bg-white/10' : ''
+                }`}
               >
-                  <PlayCircle size={22} className="text-gray-500 hover:text-neon-green transition-colors" strokeWidth={2} />
-                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                  <PlayCircle size={22} className={location.pathname === '/my-courses' ? 'text-neon-green' : 'text-gray-500'} strokeWidth={2} />
+                  <span className={`text-[10px] uppercase font-bold mt-1 ${
+                    location.pathname === '/my-courses' ? 'text-white' : 'text-gray-600'
+                  }`}>
                       Cursos
                   </span>
               </Link>

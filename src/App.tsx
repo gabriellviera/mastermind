@@ -5,6 +5,8 @@ import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/Home';
 import Cursos from './pages/Cursos';
 import MyCourses from './pages/MyCourses';
+import FreeLessons from './pages/FreeLessons';
+import NotFound from './pages/NotFound';
 import CoursePlayer from './pages/CoursePlayer';
 import CourseDetail from './pages/CourseDetail';
 import Checkout from './pages/Checkout';
@@ -51,7 +53,11 @@ export default function App() {
             <Route path="settings" element={<AdminSettings />} />
             <Route path="home-config" element={<AdminHomeConfig />} />
             <Route path="popup-config" element={<AdminPopupConfig />} />
+            <Route path="popup-config" element={<AdminPopupConfig />} />
         </Route>
+        
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
