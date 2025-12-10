@@ -1,15 +1,73 @@
 import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import { Clock, BookOpen, Star, CheckCircle, ShoppingCart, ArrowLeft, PlayCircle, Award, BadgeCheck } from 'lucide-react';
-import { courses } from '../data/courses';
 import { useCart } from '../context/CartContext';
+import { supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+
+type Course = {
+    id: string;
+    title: string;
+    description: string | null;
+    price: number;
+    image_url: string | null;
+    slug: string;
+    // Add other fields if needed for display like lessons_count, duration, etc.
+    // For now we'll mock the missing visual ones or fetch them if they existed in DB
+};
 
 export default function CourseDetail() {
-  const { id } = useParams();
-  const course = courses.find(c => c.id === id);
+  const { id } = useParams(); // This can be UUID or SLUG
   const { addToCart } = useCart();
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!course) return <div className="min-h-screen flex items-center justify-center font-bold text-2xl">Curso no encontrado</div>;
+  useEffect(() => {
+    if (id) {
+        fetchCourse();
+    }
+  }, [id]);
+
+  const fetchCourse = async () => {
+      try {
+          setLoading(true);
+          // Check if it's a UUID (simple regex check)
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id!);
+          
+          let query = supabase.from('courses').select('*');
+          
+          if (isUuid) {
+              query = query.eq('id', id).single();
+          } else {
+              query = query.eq('slug', id).single();
+          }
+
+          const { data, error } = await query;
+
+          if (error) throw error;
+          setCourse(data);
+
+      } catch (error) {
+          console.error("Error fetching course:", error);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  if (loading) {
+      return (
+          <div className="min-h-screen pt-20 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-green"></div>
+          </div>
+      )
+  }
+
+  if (!course) return (
+      <div className="min-h-screen pt-20 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-3xl font-black mb-4">Curso no encontrado</h1>
+          <Link to="/cursos" className="text-neon-green hover:underline">Volver a la tienda</Link>
+      </div>
+  );
 
   return (
     <div className="min-h-screen bg-background pt-20 pb-12 relative overflow-hidden transition-colors duration-300">
@@ -34,7 +92,13 @@ export default function CourseDetail() {
                    className="relative group"
                 >
                     <div className="aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl dark:shadow-neon-green/5 ring-1 ring-black/5 dark:ring-white/10 relative">
-                        <img src={course.image} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        {course.image_url ? (
+                            <img src={course.image_url} alt={course.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        ) : (
+                            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                <PlayCircle size={64} className="text-gray-600" />
+                            </div>
+                        )}
                         
                          {/* Play Button Overlay */}
                          <div className="absolute inset-0 flex items-center justify-center">
@@ -60,10 +124,9 @@ export default function CourseDetail() {
                          </span>
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 text-foreground">{course.title}</h1>
-                    <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                        {course.description} La arquitectura definitiva para escalar tus conocimientos. 
-                        Diseñado para la eficiencia y el impacto inmediato.
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 text-foreground leading-tight">{course.title}</h1>
+                    <p className="text-lg text-muted-foreground leading-relaxed mb-8 line-clamp-4">
+                        {course.description || "Domina las habilidades del futuro hoy. Un curso diseñado para transformar tu carrera."} 
                     </p>
 
                     {/* Price & Action */}
@@ -72,14 +135,21 @@ export default function CourseDetail() {
                             <span className="block text-xs text-muted-foreground font-bold uppercase mb-1">Precio</span>
                             <div className="flex items-baseline gap-1">
                                 <span className="text-3xl font-black text-foreground">${course.price}</span>
-                                <span className="text-sm text-muted-foreground line-through font-medium">${course.price * 1.5}</span>
+                                <span className="text-sm text-muted-foreground line-through font-medium">${Math.round(course.price * 1.5)}</span>
                             </div>
                         </div>
                         <button 
-                           onClick={() => addToCart(course)}
-                           className="flex-1 bg-foreground text-background dark:bg-neon-green dark:text-black font-bold h-full py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3"
+                           onClick={() => addToCart({
+                               id: course.id,
+                               title: course.title,
+                               description: course.description,
+                               price: course.price,
+                               image: course.image_url || ''
+                           })}
+                           className="flex-1 bg-foreground text-background dark:bg-neon-green dark:text-black font-bold h-full py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 group"
                         >
-                            <ShoppingCart size={20} /> <span className="uppercase tracking-wide">Comprar Ahora</span>
+                            <ShoppingCart size={20} className="group-hover:animate-bounce" /> 
+                            <span className="uppercase tracking-wide">Comprar Ahora</span>
                         </button>
                     </div>
                 </motion.div>
@@ -109,7 +179,7 @@ export default function CourseDetail() {
                          <BookOpen size={20} />
                     </div>
                     <div>
-                        <div className="text-2xl font-black text-gray-900 dark:text-white">{course.lessons}</div>
+                        <div className="text-2xl font-black text-gray-900 dark:text-white">12+</div>
                         <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">Lecciones</div>
                     </div>
                 </div>
