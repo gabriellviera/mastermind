@@ -1,57 +1,90 @@
-import { ArrowUpRight, DollarSign, Users, ShoppingCart, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { Users, BookOpen, DollarSign, TrendingUp, Eye, ShoppingCart } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+
+type Stats = {
+  totalUsers: number;
+  totalCourses: number;
+  totalRevenue: number;
+  pageViews: number;
+  cartAbandoned: number;
+};
 
 export default function AdminDashboard() {
-  const stats = [
-    { label: 'Ventas Totales', value: '$12,450', change: '+15%', icon: DollarSign, color: 'text-neon-green', bg: 'bg-neon-green/10' },
-    { label: 'Usuarios Activos', value: '1,234', change: '+5%', icon: Users, color: 'text-neon-blue', bg: 'bg-neon-blue/10' },
-    { label: 'En Carrito', value: '56', change: '-2%', icon: ShoppingCart, color: 'text-neon-orange', bg: 'bg-neon-orange/10' },
-    { label: 'Tasa Conversión', value: '3.2%', change: '+0.5%', icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+  const [stats, setStats] = useState<Stats>({
+    totalUsers: 0,
+    totalCourses: 0,
+    totalRevenue: 0,
+    pageViews: 0,
+    cartAbandoned: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      // Get total users
+      const { count: usersCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+
+      // Get total courses
+      const { count: coursesCount } = await supabase
+        .from('courses')
+        .select('*', { count: 'exact', head: true });
+
+      // Get total enrollments (proxy for revenue)
+      const { count: enrollmentsCount } = await supabase
+        .from('enrollments')
+        .select('*', { count: 'exact', head: true });
+
+      // Get analytics
+      const { count: pageViewsCount } = await supabase
+        .from('analytics')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'page_view');
+
+      const { count: cartAbandonedCount } = await supabase
+        .from('analytics')
+        .select('*', { count: 'exact', head: true })
+        .eq('event_type', 'add_to_cart');
+
+      setStats({
+        totalUsers: usersCount || 0,
+        totalCourses: coursesCount || 0,
+        totalRevenue: (enrollmentsCount || 0) * 99, // Assuming avg price $99
+        pageViews: pageViewsCount || 0,
+        cartAbandoned: cartAbandonedCount || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statCards = [
+    { icon: Users, label: 'Total Usuarios', value: stats.totalUsers, color: 'text-blue-500' },
+    { icon: BookOpen, label: 'Cursos Creados', value: stats.totalCourses, color: 'text-green-500' },
+    { icon: DollarSign, label: 'Ingresos ($)', value: `$${stats.totalRevenue.toLocaleString()}`, color: 'text-yellow-500' },
+    { icon: Eye, label: 'Visitas Totales', value: stats.pageViews, color: 'text-purple-500' },
+    { icon: ShoppingCart, label: 'Carritos Activos', value: stats.cartAbandoned, color: 'text-orange-500' },
+    { icon: TrendingUp, label: 'Tasa Conversión', value: stats.totalCourses > 0 ? `${((stats.totalUsers / stats.pageViews) * 100 || 0).toFixed(1)}%` : '0%', color: 'text-pink-500' },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-green"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-8 max-w-7xl mx-auto font-sans">
-       <h1 className="text-3xl font-black italic mb-8">DASHBOARD <span className="text-neon-green">PRINCIPAL</span></h1>
-
-       {/* STATS GRID */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-           {stats.map((stat, i) => (
-               <motion.div 
-                 key={stat.label}
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ delay: i * 0.1 }}
-                 className="glass-panel p-6 rounded-2xl border border-white/5 relative overflow-hidden group hover:border-white/20 transition-colors"
-               >
-                   <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:scale-110 transition-transform">
-                       <div className={`${stat.bg} p-3 rounded-xl`}>
-                           <stat.icon className={stat.color} size={24} />
-                       </div>
-                   </div>
-                   
-                   <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">{stat.label}</p>
-                   <h3 className="text-3xl font-black text-white mb-2">{stat.value}</h3>
-                   <span className={`text-xs font-bold px-2 py-1 rounded-full ${stat.change.startsWith('+') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                       {stat.change} mes pasado
-                   </span>
-               </motion.div>
-           ))}
-       </div>
-
-       {/* RECENT ACTIVITY MOCK */}
-       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-           <div className="glass-panel p-8 rounded-3xl border border-white/10">
-               <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
-                   <Users className="text-neon-blue" /> Nuevos Usuarios
-               </h3>
-               <div className="space-y-4">
-                   {[1,2,3,4,5].map(i => (
-                       <div key={i} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0 last:pb-0">
-                           <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-sm">U{i}</div>
-                               <div>
-                                   <div className="font-bold text-sm">Usuario Demo {i}</div>
-                                   <div className="text-xs text-gray-500">hace {i*5} min</div>
                                </div>
                            </div>
                            <span className="text-xs font-bold text-neon-green uppercase">Registrado</span>

@@ -3,21 +3,70 @@ import { Users, Mail, Shield, MoreHorizontal } from 'lucide-react';
 export default function AdminUsers() {
   const users = [
     { id: 1, name: 'Juan Pérez', email: 'juan@demo.com', role: 'Estudiante', status: 'Activo', joined: '10 Dic 2024' },
-    { id: 2, name: 'Maria García', email: 'maria@demo.com', role: 'Estudiante', status: 'Activo', joined: '09 Dic 2024' },
-    { id: 3, name: 'Admin User', email: 'admin@gabo.com', role: 'Admin', status: 'Activo', joined: '01 Dic 2024' },
-  ];
+  const [users, setUsers] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteUser = async (id: string) => {
+    if (!confirm('¿Eliminar este usuario?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setUsers(users.filter(u => u.id !== id));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Error al eliminar usuario');
+    }
+  };
+
+  const toggleRole = async (id: string, currentRole: string) => {
+    const newRole = currentRole === 'admin' ? 'student' : 'admin';
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', id);
+
+      if (error) throw error;
+      setUsers(users.map(u => u.id === id ? { ...u, role: newRole } : u));
+    } catch (error) {
+      console.error('Error updating role:', error);
+      alert('Error al cambiar rol');
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-green"></div>
+    </div>;
+  }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto font-sans">
-       <div className="flex items-center justify-between mb-8">
-           <h1 className="text-3xl font-black italic">LISTA DE <span className="text-neon-purple">ALUMNOS</span></h1>
-           <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-gray-400">
-               Total: <span className="text-white">1,234</span>
-           </div>
-       </div>
-
-       <div className="glass-panel overflow-hidden rounded-3xl border border-white/10">
-           <table className="w-full text-left">
                <thead className="bg-white/5 text-gray-400 text-xs font-bold uppercase tracking-wider">
                    <tr>
                        <th className="p-6">Usuario</th>
