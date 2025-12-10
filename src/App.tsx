@@ -11,6 +11,7 @@ import Login from './pages/Login';
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import AdminAnalytics from './pages/Admin/AdminAnalytics';
 import AdminCourses from './pages/Admin/AdminCourses';
 import AdminSettings from './pages/Admin/AdminSettings';
 import AdminComments from './pages/Admin/AdminComments'; // Now exists
@@ -39,6 +40,7 @@ export default function App() {
         {/* ADMIN ROUTES */}
         <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="courses" element={<AdminCourses />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="comments" element={<AdminComments />} />

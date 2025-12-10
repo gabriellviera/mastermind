@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Shield, Trash2 } from 'lucide-react';
+import { User, Shield, Trash2, Search } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 type Profile = {
@@ -13,6 +13,7 @@ type Profile = {
 export default function AdminUsers() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -68,6 +69,13 @@ export default function AdminUsers() {
     }
   };
 
+  // Filter users based on search query
+  const filteredUsers = users.filter(user =>
+    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return <div className="flex items-center justify-center h-screen">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-green"></div>
@@ -77,9 +85,21 @@ export default function AdminUsers() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black italic">
-          USUARIOS <span className="text-neon-green">({users.length})</span>
+        <h1 className="text-3xl font-black italic text-white">
+          USUARIOS <span className="text-neon-green">({filteredUsers.length})</span>
         </h1>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+        <input
+          type="text"
+          placeholder="Buscar por nombre, email o rol..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-neon-green"
+        />
       </div>
 
       <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden">
@@ -94,7 +114,8 @@ export default function AdminUsers() {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {users.map((user) => (
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
               <tr key={user.id} className="hover:bg-white/5 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -128,7 +149,14 @@ export default function AdminUsers() {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                  No se encontraron usuarios que coincidan con "{searchQuery}"
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
