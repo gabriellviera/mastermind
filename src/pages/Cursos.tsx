@@ -13,7 +13,22 @@ type Course = {
   price: number;
   image_url: string | null;
   created_at: string;
+  slug: string; // Added slug
 };
+
+export default function Cursos() {
+  const { addToCart, cart } = useCart();
+// ... (omitting unchanged lines for brevity if this was allowed, but context window helps)
+  const [courses, setCourses] = useState<Course[]>([]);
+// ...
+
+// ... inside render map ...
+                        <Link 
+                          to={`/curso-info/${course.slug || course.id}`}
+                          className="px-4 py-3 rounded-xl font-bold uppercase tracking-wide bg-white/10 hover:bg-white/20 transition-colors text-sm"
+                        >
+                          Ver Info
+                        </Link>
 
 export default function Cursos() {
   const { addToCart, cart } = useCart();
@@ -131,7 +146,7 @@ export default function Cursos() {
                       
                       <div className="flex gap-2">
                         <Link 
-                          to={`/curso-info/${course.id}`}
+                          to={`/curso-info/${course.slug || course.id}`}
                           className="px-4 py-3 rounded-xl font-bold uppercase tracking-wide bg-white/10 hover:bg-white/20 transition-colors text-sm"
                         >
                           Ver Info
