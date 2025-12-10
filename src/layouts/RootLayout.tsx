@@ -1,5 +1,6 @@
+```javascript
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, BookOpen, ShoppingBag, User, Sun, Moon, Download, PlayCircle, LogIn } from 'lucide-react';
+import { Home, BookOpen, PlayCircle, ShoppingBag, User, Menu, X, Sun, Moon, Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';

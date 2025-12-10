@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Menu, X, LayoutDashboard, Users, MessageSquare, Settings, BookOpen, LogOut, Home as HomeIcon, MessageSquareDashed, Lock, ArrowRight } from 'lucide-react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
