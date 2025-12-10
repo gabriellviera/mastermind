@@ -1,13 +1,61 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, CheckCircle, ShieldCheck, ArrowRight, Lock, Key, Smartphone } from 'lucide-react';
+import { CreditCard, CheckCircle, ShieldCheck, ArrowRight, Lock, Key, Smartphone, X, User, Mail } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export default function Checkout() {
   const { cart, total, clearCart } = useCart();
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginMode, setLoginMode] = useState<'login' | 'register'>('register');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    
+    // If not logged in and has items in cart, show login modal
+    if (!user && cart.length > 0) {
+      setShowLoginModal(true);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (loginMode === 'register') {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        if (data.user) {
+          setUser(data.user);
+          setShowLoginModal(false);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        if (data.user) {
+          setUser(data.user);
+          setShowLoginModal(false);
+        }
+      }
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Empty State - Elegant
   if (cart.length === 0) {
@@ -134,9 +182,9 @@ export default function Checkout() {
                                 setLoading(false);
                                 clearCart();
                                 setShowPaymentModal(false);
-                                alert('¡Pago Exitoso!');
+                                navigate('/my-courses'); // Redirect to my courses
                             }, 2000);
-                        }}>
+                         }}>
                              <div className="space-y-4">
                                  <div className="bg-secondary/50 p-4 rounded-2xl flex items-center gap-4 cursor-pointer border border-primary/20">
                                      <div className="w-5 h-5 rounded-full border-[5px] border-primary"></div>

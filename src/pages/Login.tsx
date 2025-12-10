@@ -16,19 +16,23 @@ export default function Login() {
 
     try {
       if (mode === 'register') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
         if (error) throw error;
-        alert('¡Cuenta creada! Revisa tu email para confirmar.');
+        
+        // Auto-login after signup (no email confirmation needed)
+        if (data.user) {
+          navigate('/my-courses'); // Redirect to their courses
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        navigate('/admin'); // Or Dashboard
+        navigate('/my-courses'); // Redirect after login
       }
     } catch (error: any) {
       alert(error.message);
