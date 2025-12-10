@@ -1,4 +1,3 @@
-```javascript
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, BookOpen, PlayCircle, ShoppingBag, User, Menu, X, Sun, Moon, Download } from 'lucide-react';
 import { useState, useEffect } from 'react';
