@@ -43,11 +43,17 @@ export default function CoursePlayer() {
         setLoading(true);
         
         // 1. Get Course Details
-        const { data: courseData, error: courseError } = await supabase
-            .from('courses')
-            .select('id, title, description')
-            .eq('id', courseId) // TODO: Support slug later if needed
-            .single();
+        // 1. Get Course Details -- Support UUID or Slug
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseId!);
+        let query = supabase.from('courses').select('id, title, description');
+
+        if (isUuid) {
+            query = query.eq('id', courseId).single();
+        } else {
+            query = query.eq('slug', courseId).single();
+        }
+
+        const { data: courseData, error: courseError } = await query;
 
         if (courseError || !courseData) throw new Error('Course not found');
         setCourse(courseData);
