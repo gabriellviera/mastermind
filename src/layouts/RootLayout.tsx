@@ -138,10 +138,14 @@ export default function RootLayout() {
               {/* Inicio */}
               <Link
                 to="/"
-                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+                className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all ${
+                  location.pathname === '/' ? 'bg-white/10' : ''
+                }`}
               >
-                  <Home size={22} className="text-gray-500" strokeWidth={2} />
-                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                  <Home size={22} className={location.pathname === '/' ? 'text-neon-green' : 'text-gray-500'} strokeWidth={2} />
+                  <span className={`text-[10px] uppercase font-bold mt-1 ${
+                    location.pathname === '/' ? 'text-white' : 'text-gray-600'
+                  }`}>
                       Inicio
                   </span>
               </Link>
@@ -149,10 +153,14 @@ export default function RootLayout() {
               {/* Tienda */}
               <Link
                 to="/cursos"
-                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+                className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all ${
+                  location.pathname === '/cursos' ? 'bg-white/10' : ''
+                }`}
               >
-                  <BookOpen size={22} className="text-gray-500" strokeWidth={2} />
-                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                  <BookOpen size={22} className={location.pathname === '/cursos' ? 'text-neon-green' : 'text-gray-500'} strokeWidth={2} />
+                  <span className={`text-[10px] uppercase font-bold mt-1 ${
+                    location.pathname === '/cursos' ? 'text-white' : 'text-gray-600'
+                  }`}>
                       Tienda
                   </span>
               </Link>
@@ -168,14 +176,18 @@ export default function RootLayout() {
                   </span>
               </button>
 
-              {/* Perfil */}
+              {/* Login/Perfil */}
               <Link
                 to="/login"
-                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+                className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all ${
+                  location.pathname === '/login' ? 'bg-white/10' : ''
+                }`}
               >
-                  <User size={22} className="text-gray-500" strokeWidth={2} />
-                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
-                      Perfil
+                  <User size={22} className={location.pathname === '/login' ? 'text-neon-green' : 'text-gray-500'} strokeWidth={2} />
+                  <span className={`text-[10px] uppercase font-bold mt-1 ${
+                    location.pathname === '/login' ? 'text-white' : 'text-gray-600'
+                  }`}>
+                      {user ? 'Perfil' : 'Entrar'}
                   </span>
               </Link>
           </div>

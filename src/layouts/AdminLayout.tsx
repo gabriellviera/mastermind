@@ -160,7 +160,7 @@ export default function AdminLayout() {
             </div>
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-background relative">
+            <main className="flex-1 p-4 lg:p-8 overflow-y-auto h-screen bg-black relative">
                 <Outlet />
             </main>
         </div>
