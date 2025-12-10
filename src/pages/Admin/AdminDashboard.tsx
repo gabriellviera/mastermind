@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Users, BookOpen, DollarSign, TrendingUp, Eye, ShoppingCart } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -27,22 +26,18 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
-      // Get total users
       const { count: usersCount } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
-      // Get total courses
       const { count: coursesCount } = await supabase
         .from('courses')
         .select('*', { count: 'exact', head: true });
 
-      // Get total enrollments (proxy for revenue)
       const { count: enrollmentsCount } = await supabase
         .from('enrollments')
         .select('*', { count: 'exact', head: true });
 
-      // Get analytics
       const { count: pageViewsCount } = await supabase
         .from('analytics')
         .select('*', { count: 'exact', head: true })
@@ -56,7 +51,7 @@ export default function AdminDashboard() {
       setStats({
         totalUsers: usersCount || 0,
         totalCourses: coursesCount || 0,
-        totalRevenue: (enrollmentsCount || 0) * 99, // Assuming avg price $99
+        totalRevenue: (enrollmentsCount || 0) * 99,
         pageViews: pageViewsCount || 0,
         cartAbandoned: cartAbandonedCount || 0,
       });
@@ -85,34 +80,37 @@ export default function AdminDashboard() {
   }
 
   return (
-                               </div>
-                           </div>
-                           <span className="text-xs font-bold text-neon-green uppercase">Registrado</span>
-                       </div>
-                   ))}
-               </div>
-               <button className="w-full mt-6 py-3 border border-white/10 rounded-xl text-sm font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
-                   Ver Todos <ArrowUpRight size={16} />
-               </button>
-           </div>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-black italic tracking-tighter">
+          DASHBOARD <span className="text-neon-green">ADMIN</span>
+        </h1>
+        <p className="text-gray-500 mt-2">Métricas en tiempo real desde Supabase</p>
+      </div>
 
-           <div className="glass-panel p-8 rounded-3xl border border-white/10">
-               <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
-                   <ShoppingCart className="text-neon-orange" /> Ventas Recientes
-               </h3>
-               {/* Empty State Mock */}
-               <div className="h-64 flex flex-col items-center justify-center text-center opacity-50">
-                   <ShoppingBagIcon className="w-16 h-16 mb-4 text-gray-600" />
-                   <div className="text-sm font-bold text-gray-500">No hay ventas recientes</div>
-               </div>
-           </div>
-       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {statCards.map((stat, idx) => (
+          <div
+            key={idx}
+            className="glass-panel p-6 rounded-2xl border border-white/10 hover:border-neon-green/30 transition-all group"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-gray-500 uppercase font-bold tracking-wider mb-2">{stat.label}</p>
+                <p className="text-3xl font-black">{stat.value}</p>
+              </div>
+              <stat.icon className={`${stat.color} group-hover:scale-110 transition-transform`} size={28} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="glass-panel p-6 rounded-2xl border border-white/10">
+        <h2 className="text-xl font-bold mb-4">Actividad Reciente</h2>
+        <p className="text-gray-500 text-sm">
+          Conectado a Supabase. Los datos se actualizan en tiempo real.
+        </p>
+      </div>
     </div>
   );
-}
-
-function ShoppingBagIcon(props: any) {
-    return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    )
 }

@@ -1,8 +1,16 @@
-import { Users, Mail, Shield, MoreHorizontal } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { User, Shield, Trash2 } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+
+type Profile = {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: string;
+  created_at: string;
+};
 
 export default function AdminUsers() {
-  const users = [
-    { id: 1, name: 'Juan Pérez', email: 'juan@demo.com', role: 'Estudiante', status: 'Activo', joined: '10 Dic 2024' },
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -67,50 +75,63 @@ export default function AdminUsers() {
   }
 
   return (
-               <thead className="bg-white/5 text-gray-400 text-xs font-bold uppercase tracking-wider">
-                   <tr>
-                       <th className="p-6">Usuario</th>
-                       <th className="p-6">Rol</th>
-                       <th className="p-6">Estado</th>
-                       <th className="p-6">Fecha Registro</th>
-                       <th className="p-6 text-right">Acciones</th>
-                   </tr>
-               </thead>
-               <tbody className="divide-y divide-white/5">
-                   {users.map(user => (
-                       <tr key={user.id} className="hover:bg-white/5 transition-colors">
-                           <td className="p-6">
-                               <div className="flex items-center gap-4">
-                                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple/20 to-blue-500/20 flex items-center justify-center font-bold text-white">
-                                       {user.name[0]}
-                                   </div>
-                                   <div>
-                                       <div className="font-bold text-white">{user.name}</div>
-                                       <div className="text-xs text-gray-500">{user.email}</div>
-                                   </div>
-                               </div>
-                           </td>
-                           <td className="p-6">
-                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${user.role === 'Admin' ? 'bg-neon-orange/10 text-neon-orange' : 'bg-white/10 text-gray-300'}`}>
-                                   {user.role === 'Admin' && <Shield size={12} />} {user.role}
-                               </span>
-                           </td>
-                           <td className="p-6">
-                               <span className="text-green-400 text-sm font-bold flex items-center gap-2">
-                                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> {user.status}
-                               </span>
-                           </td>
-                           <td className="p-6 text-gray-400 text-sm">{user.joined}</td>
-                           <td className="p-6 text-right">
-                               <button className="text-gray-500 hover:text-white transition-colors">
-                                   <MoreHorizontal size={20} />
-                               </button>
-                           </td>
-                       </tr>
-                   ))}
-               </tbody>
-           </table>
-       </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-black italic">
+          USUARIOS <span className="text-neon-green">({users.length})</span>
+        </h1>
+      </div>
+
+      <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-white/5">
+            <tr>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase">Usuario</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase">Email</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase">Rol</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase">Registro</th>
+              <th className="px-6 py-4 text-right text-xs font-bold uppercase">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {users.map((user) => (
+              <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-neon-green/10 flex items-center justify-center">
+                      <User size={20} className="text-neon-green" />
+                    </div>
+                    <span className="font-bold">{user.full_name || 'Sin nombre'}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-400">{user.email}</td>
+                <td className="px-6 py-4">
+                  <button
+                    onClick={() => toggleRole(user.id, user.role)}
+                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 ${
+                      user.role === 'admin' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+                    }`}
+                  >
+                    {user.role === 'admin' && <Shield size={12} />}
+                    {user.role}
+                  </button>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-400">
+                  {new Date(user.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 text-right">
+                  <button
+                    onClick={() => deleteUser(user.id)}
+                    className="text-red-500 hover:text-red-400 p-2"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
