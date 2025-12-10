@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { PlayCircle, Lock, ArrowRight } from 'lucide-react';
 
@@ -13,19 +12,27 @@ type EnrolledCourse = {
 };
 
 export default function MyCourses() {
-  const { user } = useAuth();
+  const [user, setUser] = useState<any>(null);
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    
     if (user) {
-      fetchMyCourses();
+      fetchMyCourses(user.id);
     } else {
       setLoading(false);
     }
-  }, [user]);
+  };
 
-  const fetchMyCourses = async () => {
+  const fetchMyCourses = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('enrollments')
@@ -38,7 +45,7 @@ export default function MyCourses() {
             image_url
           )
         `)
-        .eq('user_id', user?.id);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
