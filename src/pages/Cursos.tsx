@@ -107,7 +107,6 @@ export default function Cursos() {
                           onClick={() => addToCart({
                             id: course.id,
                             title: course.title,
-                            description: course.description || '',
                             price: course.price,
                             image: course.image_url || '',
                           })}

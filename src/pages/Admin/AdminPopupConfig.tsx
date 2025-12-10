@@ -37,7 +37,7 @@ export default function AdminPopupConfig() {
   };
 
   const handleSave = () => {
-    updateSettings({ home: localSettings });
+    updateSettings(localSettings);
     alert('Configuración guardada.');
   };
 
