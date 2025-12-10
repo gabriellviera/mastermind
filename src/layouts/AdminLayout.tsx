@@ -107,21 +107,21 @@ export default function AdminLayout() {
 
             {/* SIDEBAR */}
             <div className={`
-                fixed lg:sticky top-0 h-screen w-64 bg-[#050505] border-r border-white/5 flex flex-col z-50 transition-transform duration-300
+                fixed lg:sticky top-0 h-screen w-64 bg-gradient-to-b from-orange-950 to-black border-r border-orange-500/20 flex flex-col z-50 transition-transform duration-300
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
                 {/* Logo */}
-                <div className="p-8 flex items-center justify-between">
+                <div className="p-8 flex items-center justify-between border-b border-orange-500/20">
                     <h2 className="text-2xl font-black italic tracking-tighter text-white">
-                        GABO <span className="text-neon-green">ADMIN</span>
+                        GABO <span className="text-neon-orange">ADMIN</span>
                     </h2>
-                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500">
+                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-orange-400 hover:text-orange-300">
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Nav */}
-                <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+                <nav className="flex-1 px-4 space-y-2 overflow-y-auto py-4">
                     {sidebarItems.map(item => {
                         const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
                         
@@ -132,8 +132,8 @@ export default function AdminLayout() {
                                 onClick={() => setIsSidebarOpen(false)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                     isActive 
-                                    ? 'bg-neon-green text-black font-bold shadow-[0_0_15px_rgba(57,255,20,0.3)]' 
-                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-neon-orange text-black font-bold shadow-[0_0_15px_rgba(255,107,0,0.4)]' 
+                                    : 'text-orange-200 hover:bg-orange-900/30 hover:text-white'
                                 }`}
                             >
                                 <item.icon size={18} />
@@ -144,7 +144,7 @@ export default function AdminLayout() {
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-white/5">
+                <div className="p-4 border-t border-orange-500/20">
                     <button onClick={() => {
                         sessionStorage.removeItem('admin_secret_auth');
                         setIsAdminAuth(false);

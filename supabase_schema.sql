@@ -90,3 +90,53 @@ create policy "Admins can view analytics" on public.analytics
 -- insert into storage.buckets (id, name, public) values ('course-content', 'course-content', true);
 -- create policy "Public Access" on storage.objects for select using ( bucket_id = 'course-content' );
 -- create policy "Admin Upload" on storage.objects for insert with check ( bucket_id = 'course-content' and (select role from public.profiles where id = auth.uid()) = 'admin' );
+
+-- ============================================
+-- COMMENTS TABLE
+-- ============================================
+
+-- Table for Course Comments
+create table if not exists public.comments (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null,
+  course_id uuid references public.courses(id) on delete cascade not null,
+  comment_text text not null,
+  likes integer default 0,
+  admin_reply text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Enable RLS
+alter table public.comments enable row level security;
+
+-- Policies for comments
+create policy "Anyone can view comments" on public.comments
+  for select using (true);
+
+create policy "Authenticated users can create comments" on public.comments
+  for insert with check (auth.uid() = user_id);
+
+create policy "Users can update their own comments" on public.comments
+  for update using (auth.uid() = user_id);
+
+create policy "Admins can update any comment (for replies)" on public.comments
+  for update using (
+    exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid() and profiles.role = 'admin'
+    )
+  );
+
+create policy "Users and admins can delete comments" on public.comments
+  for delete using (
+    auth.uid() = user_id or
+    exists (
+      select 1 from public.profiles
+      where profiles.id = auth.uid() and profiles.role = 'admin'
+    )
+  );
+
+-- Create index for performance
+create index if not exists comments_course_id_idx on public.comments(course_id);
+create index if not exists comments_user_id_idx on public.comments(user_id);
