@@ -165,16 +165,16 @@ export default function RootLayout() {
                   </span>
               </Link>
               
-              {/* Mis Cursos Logic */}
-              <button 
-                onClick={() => user ? navigate('/cursos') : navigate('/login')}
+              {/* Mis Cursos - Changed to Link for consistency */}
+              <Link
+                to={user ? "/cursos" : "/login"}
                 className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
               >
-                  <PlayCircle size={22} className="text-gray-500 group-hover:text-neon-green transition-colors" strokeWidth={2} />
+                  <PlayCircle size={22} className="text-gray-500 hover:text-neon-green transition-colors" strokeWidth={2} />
                   <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
                       Cursos
                   </span>
-              </button>
+              </Link>
 
               {/* Login/Perfil */}
               <Link
