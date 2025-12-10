@@ -64,32 +64,6 @@ export default function RootLayout() {
     }
   };
 
-  const MobileNavItem = ({ icon: Icon, label, path, onClick }: any) => {
-      const isActive = location.pathname === path;
-      return (
-          <button 
-            onClick={onClick || (() => navigate(path))}
-            className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
-          >
-              {isActive && (
-                  <motion.div 
-                    layoutId="nav-pill"
-                    className="absolute inset-0 bg-white/10 rounded-2xl"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-              )}
-              <Icon 
-                 size={22} 
-                 className={`z-10 transition-colors ${isActive ? 'text-neon-green drop-shadow-[0_0_8px_rgba(57,255,20,0.8)]' : 'text-gray-500'}`} 
-                 strokeWidth={isActive ? 2.5 : 2}
-              />
-              <span className={`text-[10px] uppercase font-bold mt-1 z-10 ${isActive ? 'text-white' : 'text-gray-600'}`}>
-                  {label}
-              </span>
-          </button>
-      )
-  };
-
   return (
     <div className={`min-h-screen font-sans bg-background text-foreground selection:bg-neon-green/30`}>
       
@@ -161,8 +135,27 @@ export default function RootLayout() {
       {/* MOBILE FLOAT NAV (iOS Style) */}
       <div className="md:hidden fixed bottom-2 left-1/2 -translate-x-1/2 w-[95%] max-w-sm z-50">
           <div className="ios-blur rounded-3xl border border-white/10 p-2 flex justify-between items-center shadow-2xl shadow-neon-green/10">
-              <MobileNavItem icon={Home} label="Inicio" path="/" />
-              <MobileNavItem icon={BookOpen} label="Tienda" path="/cursos" />
+              {/* Inicio */}
+              <Link
+                to="/"
+                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+              >
+                  <Home size={22} className="text-gray-500" strokeWidth={2} />
+                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                      Inicio
+                  </span>
+              </Link>
+
+              {/* Tienda */}
+              <Link
+                to="/cursos"
+                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+              >
+                  <BookOpen size={22} className="text-gray-500" strokeWidth={2} />
+                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                      Tienda
+                  </span>
+              </Link>
               
               {/* Mis Cursos Logic */}
               <button 
@@ -175,7 +168,16 @@ export default function RootLayout() {
                   </span>
               </button>
 
-              <MobileNavItem icon={User} label="Perfil" path="/login" />
+              {/* Perfil */}
+              <Link
+                to="/login"
+                className="relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-all"
+              >
+                  <User size={22} className="text-gray-500" strokeWidth={2} />
+                  <span className="text-[10px] uppercase font-bold mt-1 text-gray-600">
+                      Perfil
+                  </span>
+              </Link>
           </div>
       </div>
 
