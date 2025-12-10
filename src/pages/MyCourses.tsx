@@ -15,7 +15,23 @@ type EnrolledCourse = {
 export default function MyCourses() {
   const [user, setUser] = useState<any>(null);
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
-  // ...
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    
+    if (user) {
+      fetchMyCourses(user.id);
+    } else {
+      setLoading(false);
+    }
+  };
   const fetchMyCourses = async (userId: string) => {
     try {
       const { data, error } = await supabase
