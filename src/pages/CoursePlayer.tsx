@@ -45,17 +45,23 @@ export default function CoursePlayer() {
         // 1. Get Course Details
         // 1. Get Course Details -- Support UUID or Slug
         const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(courseId!);
-        let query = supabase.from('courses').select('id, title, description');
-
+        
+        let data, error;
+        
         if (isUuid) {
-            query = query.eq('id', courseId).single();
+            const result = await supabase.from('courses').select('id, title, description').eq('id', courseId).single();
+            data = result.data;
+            error = result.error;
         } else {
-            query = query.eq('slug', courseId).single();
+            const result = await supabase.from('courses').select('id, title, description').eq('slug', courseId).single();
+            data = result.data;
+            error = result.error;
         }
 
-        const { data: courseData, error: courseError } = await query;
-
-        if (courseError || !courseData) throw new Error('Course not found');
+        if (error || !data) throw new Error('Course not found');
+        
+        // Cast to Course type manually to hush TS if needed, though 'data' inference usually works
+        const courseData = data as Course;
         setCourse(courseData);
 
         // 2. Get Lessons

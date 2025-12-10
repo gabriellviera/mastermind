@@ -34,18 +34,20 @@ export default function CourseDetail() {
           // Check if it's a UUID (simple regex check)
           const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id!);
           
-          let query = supabase.from('courses').select('*');
+          let data, error;
           
           if (isUuid) {
-              query = query.eq('id', id).single();
+              const res = await supabase.from('courses').select('*').eq('id', id).single();
+              data = res.data;
+              error = res.error;
           } else {
-              query = query.eq('slug', id).single();
+              const res = await supabase.from('courses').select('*').eq('slug', id).single();
+              data = res.data;
+              error = res.error;
           }
 
-          const { data, error } = await query;
-
           if (error) throw error;
-          setCourse(data);
+          setCourse(data as Course);
 
       } catch (error) {
           console.error("Error fetching course:", error);
