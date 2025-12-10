@@ -26,7 +26,7 @@ export default function CartSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 z-[70] h-full w-full max-w-md bg-[#0a0a0a] border-l border-white/10 shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 z-[70] h-full w-[85vw] sm:w-96 max-w-md bg-[#0a0a0a] border-l border-white/10 shadow-2xl flex flex-col"
           >
             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-black/50 backdrop-blur-xl">
               <h2 className="text-xl font-black italic flex items-center gap-2">
