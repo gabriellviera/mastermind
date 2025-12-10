@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Upload, Image as ImageIcon, Trash2, Plus, Edit2, Save } from 'lucide-react';
+import { Upload, Image as ImageIcon, Trash2, Plus, Edit2, Save, ChevronDown, PlayCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import AdminLessons from '../../components/AdminLessons';
 
 type Course = {
   id: string;
@@ -16,6 +17,7 @@ export default function AdminCourses() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -248,9 +250,9 @@ export default function AdminCourses() {
               </label>
             </div>
             <div className="p-4">
-              <h3 className="font-bold text-lg mb-2">{course.title}</h3>
+              <h3 className="font-bold text-lg mb-2 text-white">{course.title}</h3>
               <p className="text-sm text-gray-400 mb-4 line-clamp-2">{course.description}</p>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-neon-green font-black text-xl">${course.price}</span>
                 <div className="flex gap-2">
                   <button
@@ -263,7 +265,7 @@ export default function AdminCourses() {
                         image_url: course.image_url || '',
                       });
                     }}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white"
                   >
                     <Edit2 size={16} />
                   </button>
@@ -275,7 +277,27 @@ export default function AdminCourses() {
                   </button>
                 </div>
               </div>
+
+              {/* Lessons Toggle */}
+              <button
+                onClick={() => setExpandedCourse(expandedCourse === course.id ? null : course.id)}
+                className="w-full bg-blue-500/20 text-blue-400 px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-500/30 transition-colors"
+              >
+                <PlayCircle size={16} />
+                Gestionar Lecciones
+                <ChevronDown 
+                  size={16} 
+                  className={`transition-transform ${expandedCourse === course.id ? 'rotate-180' : ''}`}
+                />
+              </button>
             </div>
+
+            {/* Expanded Lessons Section */}
+            {expandedCourse === course.id && (
+              <div className="border-t border-white/10 p-4 bg-black/30">
+                <AdminLessons courseId={course.id} courseName={course.title} />
+              </div>
+            )}
           </div>
         ))}
       </div>
