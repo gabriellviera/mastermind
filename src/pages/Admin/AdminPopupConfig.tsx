@@ -1,13 +1,43 @@
-import { useState } from 'react';
-import { Save, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, Upload } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { supabase } from '../../lib/supabase';
 
 export default function AdminPopupConfig() {
   const { settings, updateSettings } = useSettings();
+  const [uploading, setUploading] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
 
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `popup-${Date.now()}.${fileExt}`;
+      const filePath = `popup-media/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('course-content')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('course-content').getPublicUrl(filePath);
+      setLocalSettings({ ...localSettings, popupMediaUrl: data.publicUrl });
+      
+      alert('Archivo subido exitosamente');
+    } catch (error) {
+      console.error('Error uploading:', error);
+      alert('Error al subir archivo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSave = () => {
-    updateSettings(localSettings);
+    updateSettings({ home: localSettings });
     alert('Configuración guardada.');
   };
 
@@ -54,14 +84,38 @@ export default function AdminPopupConfig() {
           </div>
 
           <div>
-              <label className="block text-xs font-bold uppercase text-gray-500 mb-2">URL del Recurso (Imagen o Video Embed)</label>
-              <input 
-                type="text" 
-                value={localSettings.popupMediaUrl || ''}
-                onChange={e => setLocalSettings({...localSettings, popupMediaUrl: e.target.value})}
-                placeholder="https://..."
-                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-neon-green"
+            <label className="block text-sm font-bold mb-2">Media del Popup</label>
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-neon-green transition-colors">
+                <Upload size={20} />
+                <span>{uploading ? 'Subiendo...' : `Subir ${localSettings.popupType === 'image' ? 'Imagen' : 'Video'}`}</span>
+                <input
+                  type="file"
+                  accept={localSettings.popupType === 'image' ? 'image/*' : 'video/*'}
+                  onChange={handleMediaUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+              
+              {localSettings.popupMediaUrl && (
+                <div className="mt-2">
+                  {localSettings.popupType === 'image' ? (
+                    <img src={localSettings.popupMediaUrl} alt="Preview" className="w-32 h-32 object-cover rounded-xl" />
+                  ) : (
+                    <video src={localSettings.popupMediaUrl} className="w-full max-w-md rounded-xl" controls />
+                  )}
+                </div>
+              )}
+              
+              <input
+                type="text"
+                placeholder="O pega la URL aquí"
+                value={localSettings.popupMediaUrl}
+                onChange={(e) => setLocalSettings({ ...localSettings, popupMediaUrl: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-neon-green text-sm"
               />
+            </div>
           </div>
 
           {localSettings.popupType === 'video' && (
