@@ -1,10 +1,40 @@
-import { Save, Image as ImageIcon, Link as LinkIcon, Type } from 'lucide-react';
+import { Save, Image as ImageIcon, Link as LinkIcon, Type, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { useSettings } from '../../context/SettingsContext';
+import { supabase } from '../../lib/supabase';
 
 export default function AdminHomeConfig() {
   const { settings, updateSettings } = useSettings();
   const [localSettings, setLocalSettings] = useState(settings);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `hero-${Date.now()}.${fileExt}`;
+      const filePath = `hero-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('course-content')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from('course-content').getPublicUrl(filePath);
+      setLocalSettings({ ...localSettings, heroImage: data.publicUrl });
+      
+      alert('Imagen subida exitosamente');
+    } catch (error) {
+      console.error('Error uploading:', error);
+      alert('Error al subir imagen');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Sync with context on save
   const handleSave = () => {
@@ -66,17 +96,37 @@ export default function AdminHomeConfig() {
                    
                    <div className="space-y-6">
                        <div>
-                           <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Imagen de Fondo (URL)</label>
+                           <label className="block text-xs font-bold uppercase text-gray-500 mb-2">Imagen de Fondo</label>
+                           
+                           {/* Upload Button */}
+                           <label className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:border-neon-green transition-colors mb-3">
+                               <Upload size={18} />
+                               <span className="text-sm">{uploading ? 'Subiendo...' : 'Subir Imagen'}</span>
+                               <input
+                                   type="file"
+                                   accept="image/*"
+                                   onChange={handleImageUpload}
+                                   className="hidden"
+                                   disabled={uploading}
+                               />
+                           </label>
+
+                           {/* Preview */}
+                           {localSettings.heroImage && (
+                               <div className="mb-3">
+                                   <img src={localSettings.heroImage} alt="Preview" className="w-full h-32 object-cover rounded-xl" />
+                               </div>
+                           )}
+
+                           {/* URL Input */}
                            <div className="flex gap-2">
                                <input 
                                   type="text" 
+                                  placeholder="O pega la URL aquí"
                                   value={localSettings.heroImage}
                                   onChange={e => setLocalSettings({...localSettings, heroImage: e.target.value})}
                                   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-neon-blue outline-none text-xs font-mono"
                                />
-                               <div className="w-12 h-12 bg-white/5 rounded-lg flex-shrink-0 overflow-hidden border border-white/10">
-                                   <img src={localSettings.heroImage} alt="Preview" className="w-full h-full object-cover" />
-                               </div>
                            </div>
                            <p className="text-[10px] text-gray-500 mt-2">*Se aplicará un efecto de "Fade a Negro" automáticamente.</p>
                        </div>
