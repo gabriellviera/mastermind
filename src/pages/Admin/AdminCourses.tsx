@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Upload, Image as ImageIcon, Trash2, Plus, Edit2, Save, ChevronDown, PlayCircle } from 'lucide-react';
+import { Upload, Image as ImageIcon, Trash2, Plus, Edit2, Save, PlayCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import AdminLessons from '../../components/AdminLessons';
+import { Link } from 'react-router-dom';
 
 type Course = {
   id: string;
@@ -17,7 +17,6 @@ export default function AdminCourses() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -278,26 +277,15 @@ export default function AdminCourses() {
                 </div>
               </div>
 
-              {/* Lessons Toggle */}
-              <button
-                onClick={() => setExpandedCourse(expandedCourse === course.id ? null : course.id)}
+              {/* Lessons Button */}
+              <Link
+                to={`/admin/courses/${course.id}/lessons`}
                 className="w-full bg-blue-500/20 text-blue-400 px-4 py-2 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-500/30 transition-colors"
               >
                 <PlayCircle size={16} />
                 Gestionar Lecciones
-                <ChevronDown 
-                  size={16} 
-                  className={`transition-transform ${expandedCourse === course.id ? 'rotate-180' : ''}`}
-                />
-              </button>
+              </Link>
             </div>
-
-            {/* Expanded Lessons Section */}
-            {expandedCourse === course.id && (
-              <div className="border-t border-white/10 p-4 bg-black/30">
-                <AdminLessons courseId={course.id} courseName={course.title} />
-              </div>
-            )}
           </div>
         ))}
       </div>

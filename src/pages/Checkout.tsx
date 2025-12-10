@@ -222,6 +222,90 @@ export default function Checkout() {
                 </div>
             )}
         </AnimatePresence>
+
+        {/* LOGIN MODAL */}
+        <AnimatePresence>
+            {showLoginModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                        onClick={() => navigate('/')}
+                    />
+                    
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 40 }}
+                        className="bg-card w-full max-w-md p-8 rounded-[2.5rem] shadow-2xl border border-border relative z-[101]"
+                    >
+                         <div className="flex items-center justify-between mb-8">
+                             <div>
+                                 <h2 className="text-2xl font-black text-foreground">Inicia Sesión</h2>
+                                 <p className="text-sm text-muted-foreground">Para continuar con tu compra</p>
+                             </div>
+                             <button onClick={() => navigate('/')} className="bg-secondary p-2 rounded-full text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                                 <X size={20} />
+                             </button>
+                         </div>
+
+                         {/* TABS */}
+                         <div className="grid grid-cols-2 bg-secondary p-1 rounded-2xl mb-8">
+                             <button 
+                               onClick={() => setLoginMode('login')}
+                               className={`py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all ${loginMode === 'login' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                             >
+                                 Entrar
+                             </button>
+                             <button 
+                               onClick={() => setLoginMode('register')}
+                               className={`py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all ${loginMode === 'register' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground'}`}
+                             >
+                                 Crear Cuenta
+                             </button>
+                         </div>
+
+                         <form onSubmit={handleLogin} className="space-y-4">
+                             <div className="relative">
+                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                                 <input 
+                                   type="email" 
+                                   placeholder="Email" 
+                                   value={email}
+                                   onChange={(e) => setEmail(e.target.value)}
+                                   className="w-full bg-secondary border-transparent focus:bg-background focus:border-ring rounded-2xl pl-12 pr-4 py-4 outline-none text-foreground placeholder:text-muted-foreground transition-all"
+                                   required
+                                 />
+                             </div>
+                             
+                             <div className="relative">
+                                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                                 <input 
+                                   type="password" 
+                                   placeholder="Contraseña" 
+                                   value={password}
+                                   onChange={(e) => setPassword(e.target.value)}
+                                   className="w-full bg-secondary border-transparent focus:bg-background focus:border-ring rounded-2xl pl-12 pr-4 py-4 outline-none text-foreground placeholder:text-muted-foreground transition-all"
+                                   required
+                                   minLength={6}
+                                 />
+                             </div>
+
+                             <button 
+                               type="submit" 
+                               disabled={loading}
+                               className="w-full bg-neon-green text-black font-black text-lg py-4 rounded-2xl hover:bg-[#2bff00] transition-all flex items-center justify-center gap-2"
+                             >
+                                 {loading ? 'Procesando...' : (loginMode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta')}
+                                 <ArrowRight size={20} strokeWidth={3} />
+                             </button>
+                         </form>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     </div>
   );
 }

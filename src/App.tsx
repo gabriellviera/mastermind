@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminAnalytics from './pages/Admin/AdminAnalytics';
 import AdminCourses from './pages/Admin/AdminCourses';
+import AdminCourseLessons from './pages/Admin/AdminCourseLessons';
 import AdminSettings from './pages/Admin/AdminSettings';
 import AdminComments from './pages/Admin/AdminComments'; // Now exists
 import AdminUsers from './pages/Admin/AdminUsers'; // Now exists
@@ -44,6 +45,7 @@ export default function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="courses" element={<AdminCourses />} />
+            <Route path="courses/:courseId/lessons" element={<AdminCourseLessons />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="comments" element={<AdminComments />} />
             <Route path="settings" element={<AdminSettings />} />
